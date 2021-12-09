@@ -40,6 +40,7 @@ class WeatherActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_weather)
 
+        // 查询有无存储的城市，若有，则直接显示
         if (viewModel.locationLng.isEmpty())
             viewModel.locationLng = intent.getStringExtra("location_lng") ?: ""
 
@@ -49,6 +50,7 @@ class WeatherActivity : AppCompatActivity() {
         if (viewModel.placeName.isEmpty())
             viewModel.placeName = intent.getStringExtra("place_name") ?: ""
 
+        // 当weatherLiveData改变时，更新页面
         viewModel.weatherLiveData.observe(this, Observer { result ->
             val weather = result.getOrNull()
             if (weather != null) {
@@ -57,21 +59,25 @@ class WeatherActivity : AppCompatActivity() {
                 Toast.makeText(this, "无法成功获取天气信息", Toast.LENGTH_SHORT).show()
                 result.exceptionOrNull()?.printStackTrace()
             }
+            // 刷新状态关闭
             swipRefresh.isRefreshing = false
         })
 
         swipRefresh.setColorSchemeResources(R.color.colorPrimary)
+        // 打开Activity自动更新weather
         refreshWeather()
+
+        // 下拉刷新
         swipRefresh.setOnRefreshListener {
             refreshWeather()
         }
 
-        viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
-
+        // 状态栏按钮
         navBtn.setOnClickListener {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
+        // 添加状态栏监听器
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
             }
@@ -79,6 +85,7 @@ class WeatherActivity : AppCompatActivity() {
             override fun onDrawerOpened(drawerView: View) {
             }
 
+            // 当关闭状态栏时，关闭屏幕输入法
             override fun onDrawerClosed(drawerView: View) {
                 val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
                 manager.hideSoftInputFromWindow(drawerView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
@@ -91,11 +98,14 @@ class WeatherActivity : AppCompatActivity() {
 
     }
 
+    // 刷新weather
     fun refreshWeather() {
         viewModel.refreshWeather(viewModel.locationLng, viewModel.locationLat)
+        // 刷新状态开启
         swipRefresh.isRefreshing = true
     }
 
+    // 显示天气信息，此函数的操作为填充数据
     private fun showWeatherInfo(weather: Weather) {
         placeName.text = viewModel.placeName
         val realtime = weather.realtime
@@ -115,18 +125,24 @@ class WeatherActivity : AppCompatActivity() {
         for (i in 0 until days) {
             val skycon = daily.skycon[i]
             val temperature = daily.temperature[i]
+
+            // 获取列表项布局
             val view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false)
             val dateInfo = view.findViewById(R.id.dateInfo) as TextView
             val skyIcon = view.findViewById(R.id.skyIcon) as ImageView
             val skyInfo = view.findViewById(R.id.skyInfo) as TextView
             val temperatureInfo = view.findViewById(R.id.temperatureInfo) as TextView
+
+            // 填充列表数据
             val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
             dateInfo.text = simpleDateFormat.format(simpleDateFormat.parse(skycon.date))
+
             val sky = getSky(skycon.value)
             skyIcon.setImageResource(sky.icon)
             skyInfo.text = sky.info
             val tempText = "${temperature.min.toInt()}"
             temperatureInfo.text = tempText
+
             forecastLayout.addView(view)
         }
 

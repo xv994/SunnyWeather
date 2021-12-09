@@ -2,6 +2,7 @@ package com.example.sunnyweather.android.logic.model
 
 import com.google.gson.annotations.SerializedName
 
+// 地址信息数据类
 data class PlaceResponse(val status: String, val places: List<Place>)
 
 data class Place(val name: String, val location: Location, @SerializedName("formatted_address") val address: String)

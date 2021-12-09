@@ -13,6 +13,10 @@ class PlaceViewModel : ViewModel() {
 
     val placeList = ArrayList<Place>()
 
+    // 当searchLiveData改变时，调用 Repository.searchPlaces(query)
+    // 返回一个LiveData<Place>对象，可供Activity观察
+    // 这是因为Repository.searchPlaces(query) 返回的是一个新的LiveData对象无法观察其改变
+    // Transformation.switchMap可返回一个可观察的LiveData对象
     val placeLiveData = Transformations.switchMap(searchLiveData) { query ->
         Repository.searchPlaces(query)
     }

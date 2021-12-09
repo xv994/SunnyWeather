@@ -29,6 +29,7 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
             val place = placeList[position]
             val activity = fragment.activity
 
+            // 如果fragment所在的activity为WeatherActivity则直接修改activity中的信息
             if (activity is WeatherActivity) {
                 activity.drawerLayout.closeDrawers()
                 activity.viewModel.locationLng = place.location.lng
@@ -36,6 +37,7 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
                 activity.viewModel.placeName = place.name
                 activity.refreshWeather()
             }
+            // 如果不在，则跳转到WeatherActivity
             else {
                 val intent = Intent(parent.context, WeatherActivity::class.java).apply {
                     putExtra("location_lng", place.location.lng)
@@ -43,6 +45,7 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
                     putExtra("place_name", place.name)
                 }
                 fragment.startActivity(intent)
+                // 结束当前Activity
                 activity?.finish()
             }
             fragment.viewModel.savePlace(place)

@@ -38,6 +38,7 @@ class PlaceFragment : Fragment() {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        // 若fragment运行在MainActivity中且有存储的地址信息则启动WeatherActivity
         if (activity is MainActivity && viewModel.isPlaceSaved()) {
             val place = viewModel.getSavedPlace()
             val intent = Intent(context, WeatherActivity::class.java).apply {
@@ -50,11 +51,13 @@ class PlaceFragment : Fragment() {
             return
         }
 
+        // 若不在，则直接更新recyclerView的数据源
         val layoutManager = LinearLayoutManager(activity)
         recyclerView.layoutManager = layoutManager
         adapter = PlaceAdapter(this, viewModel.placeList)
         recyclerView.adapter = adapter
 
+        // 当搜索栏信息改变时就搜索
         searchPlaceEdit.addTextChangedListener { editable ->
             val content = editable.toString()
             if (content.isNotEmpty()) {
@@ -67,6 +70,7 @@ class PlaceFragment : Fragment() {
             }
         }
 
+        // 若地址信息改变，则更新recyclerView的数据源
         viewModel.placeLiveData.observe(viewLifecycleOwner, Observer { result ->
             val places = result.getOrNull()
             if (places != null) {

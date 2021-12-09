@@ -2,6 +2,7 @@ package com.example.sunnyweather.android.logic.model
 
 import com.example.sunnyweather.R
 
+// 建立map映射，将接口发送的数据与中文和图片资源对应
 class Sky (val info: String, val icon: Int, val bg: Int)
 
 private val sky = mapOf(

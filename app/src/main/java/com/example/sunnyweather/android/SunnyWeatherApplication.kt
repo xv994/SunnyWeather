@@ -9,6 +9,7 @@ class SunnyWeatherApplication : Application() {
         // 彩云天气API令牌
         const val TOKEN = "M0X7mVg5VchyILlH"
 
+        // 便于代码编写时获取上下文
         @SuppressLint("StaticFieldLeak")
         lateinit var context: Context
     }
