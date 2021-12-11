@@ -24,6 +24,11 @@ object PlaceDao {
     // 判断有无保存的地址信息
     fun isPlaceSaved() = sharedPreferences().contains("place")
 
+    // 清除sharedPreferences
+    fun clearPlace() = sharedPreferences().edit {
+        this.clear()
+    }
+
     // 获取SharedPreferences
     private fun sharedPreferences() = SunnyWeatherApplication.context.getSharedPreferences("sunny_weather", Context.MODE_PRIVATE)
 

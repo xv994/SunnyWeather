@@ -1,14 +1,12 @@
 package com.example.sunnyweather.android.ui.weather
 
-import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -16,7 +14,10 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.sunnyweather.MainActivity
 import com.example.sunnyweather.R
+import com.example.sunnyweather.android.logic.model.Location
+import com.example.sunnyweather.android.logic.model.Place
 import com.example.sunnyweather.android.logic.model.Weather
 import com.example.sunnyweather.android.logic.model.getSky
 import kotlinx.android.synthetic.main.activity_weather.*
@@ -24,7 +25,6 @@ import kotlinx.android.synthetic.main.forecast.*
 import kotlinx.android.synthetic.main.life_index.*
 import kotlinx.android.synthetic.main.now.*
 import java.util.*
-import kotlin.concurrent.thread
 
 class WeatherActivity : AppCompatActivity() {
 
@@ -49,6 +49,9 @@ class WeatherActivity : AppCompatActivity() {
 
         if (viewModel.placeName.isEmpty())
             viewModel.placeName = intent.getStringExtra("place_name") ?: ""
+
+        if (viewModel.placeAddress.isEmpty())
+            viewModel.placeAddress = intent.getStringExtra("place_address") ?: ""
 
         // 当weatherLiveData改变时，更新页面
         viewModel.weatherLiveData.observe(this, Observer { result ->
@@ -77,6 +80,28 @@ class WeatherActivity : AppCompatActivity() {
             drawerLayout.openDrawer(GravityCompat.START)
         }
 
+        if (viewModel.isStarPlace()) {
+            starBtn.background = resources.getDrawable(R.drawable.ic_star)
+        }
+
+        starBtn.setOnClickListener {
+            if (starBtn.background.constantState!! == resources.getDrawable(R.drawable.ic_star).constantState) {
+                starBtn.background = resources.getDrawable(R.drawable.ic_star_border)
+                viewModel.deletePlace(Place(viewModel.placeName, Location(viewModel.locationLng, viewModel.locationLat), viewModel.placeAddress))
+                Toast.makeText(this, "取消收藏", Toast.LENGTH_SHORT).show()
+            } else {
+                starBtn.background = resources.getDrawable(R.drawable.ic_star)
+                viewModel.addStarPlace(Place(viewModel.placeName, Location(viewModel.locationLng, viewModel.locationLat), viewModel.placeAddress))
+                Toast.makeText(this, "加入收藏", Toast.LENGTH_SHORT).show()
+            }
+            viewModel.starPlaceSize.value = viewModel.starPlaceList.size
+        }
+
+        searchBtn.setOnClickListener {
+            viewModel.clearPlace()
+            startActivity(Intent(this, MainActivity::class.java))
+        }
+
         // 添加状态栏监听器
         drawerLayout.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -87,13 +112,17 @@ class WeatherActivity : AppCompatActivity() {
 
             // 当关闭状态栏时，关闭屏幕输入法
             override fun onDrawerClosed(drawerView: View) {
-                val manager = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                manager.hideSoftInputFromWindow(drawerView.windowToken, InputMethodManager.HIDE_NOT_ALWAYS)
+                starPlaceFragment.onPause()
             }
 
             override fun onDrawerStateChanged(newState: Int) {
+                starPlaceFragment.onResume()
             }
 
+        })
+
+        viewModel.starPlaceSize.observe(this, Observer {
+            viewModel.refreshStarPlace()
         })
 
     }
@@ -153,7 +182,6 @@ class WeatherActivity : AppCompatActivity() {
         ultravioletText.text = lifeIndex.ultraviolet[0].desc
         carWashingText.text = lifeIndex.carWashing[0].desc
         weatherLayout.visibility = View.VISIBLE
-
 
     }
 }

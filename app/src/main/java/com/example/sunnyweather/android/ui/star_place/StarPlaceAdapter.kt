@@ -1,6 +1,5 @@
-package com.example.sunnyweather.android.ui.place
+package com.example.sunnyweather.android.ui.star_place
 
-import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,7 +10,7 @@ import com.example.sunnyweather.android.logic.model.Place
 import com.example.sunnyweather.android.ui.weather.WeatherActivity
 import kotlinx.android.synthetic.main.activity_weather.*
 
-class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: List<Place>) : RecyclerView.Adapter<PlaceAdapter.ViewHolder>() {
+class StarPlaceAdapter(private val fragment: StarPlaceFragment, private val placeList: List<Place>) : RecyclerView.Adapter<StarPlaceAdapter.ViewHolder>() {
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val placeName: TextView = view.findViewById(R.id.placeName)
         val placeAddress: TextView = view.findViewById(R.id.placeAddress)
@@ -35,19 +34,6 @@ class PlaceAdapter(private val fragment: PlaceFragment, private val placeList: L
                 activity.viewModel.placeAddress = place.address
                 activity.refreshWeather()
             }
-            // 如果不在，则跳转到WeatherActivity
-            else {
-                val intent = Intent(parent.context, WeatherActivity::class.java).apply {
-                    putExtra("location_lng", place.location.lng)
-                    putExtra("location_lat", place.location.lat)
-                    putExtra("place_name", place.name)
-                    putExtra("place_address", place.address)
-                }
-                fragment.startActivity(intent)
-                // 结束当前Activity
-                activity?.finish()
-            }
-            fragment.viewModel.savePlace(place)
         }
 
         return holder

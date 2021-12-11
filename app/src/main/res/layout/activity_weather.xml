@@ -44,8 +44,8 @@
         android:background="@color/colorPrimary">
 
         <fragment
-            android:id="@+id/placeFragment"
-            android:name="com.example.sunnyweather.android.ui.place.PlaceFragment"
+            android:id="@+id/starPlaceFragment"
+            android:name="com.example.sunnyweather.android.ui.star_place.StarPlaceFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="25dp"/>

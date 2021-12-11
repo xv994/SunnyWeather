@@ -2,6 +2,7 @@ package com.example.sunnyweather.android.logic
 
 import androidx.lifecycle.liveData
 import com.example.sunnyweather.android.logic.dao.PlaceDao
+import com.example.sunnyweather.android.logic.dao.StarPlaceDao
 import com.example.sunnyweather.android.logic.model.Place
 import com.example.sunnyweather.android.logic.model.Weather
 import com.example.sunnyweather.android.logic.network.SunnyWeatherNetwork
@@ -70,5 +71,16 @@ object Repository {
     fun getSavedPlace() = PlaceDao.getSavedPlace()
 
     fun isPlaceSaved() = PlaceDao.isPlaceSaved()
+
+    fun clearPlace() = PlaceDao.clearPlace()
+
+    // 操作关注地址
+    fun addStarPlace(place: Place) = StarPlaceDao.insert(place)
+
+    fun deletePlace(place: Place) = StarPlaceDao.delete(place)
+
+    fun getStarPlaceList() : ArrayList<Place> = StarPlaceDao.select()
+
+    fun isStarPlace(place: Place) : Boolean = StarPlaceDao.isStarPlace(place)
 
 }
